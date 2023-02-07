@@ -8,7 +8,7 @@ export default class AppStore {
   markets = []; //todo (if !includes(e){markets.push(e.market_display_name)})
   symbols = []; //todo (if (e.market_display_name == this.selected_market){symbols.push(e.display_name)})
   contracts_for = [];
-  selected_market = "Forex";
+  selected_market = "Derived";
   selected_symbol = "AUD/USD";
   selected_contracts_for = "Asians";
 
@@ -54,19 +54,32 @@ export default class AppStore {
     product_type: "basic",
   };
 
+  setSelectedMarket(market) {
+    this.selected_market = market;
+    this.getActiveSymbols()
+  }
+
+  setSelectedSymbol(symbol) {
+    this.selected_symbol = symbol;
+    this.getActiveSymbols()
+  }
+
+  setSelectedContractsFor(contract) {
+    this.selected_contracts_for = contract;
+  }
+
   connect_ws() {
     this.reference.current = new WebSocket(
       "wss://ws.binaryws.com/websockets/v3?app_id=1089"
     );
   }
 
-  connect_wss() {
-    this.connect_ws();
+  async connect_wss() {
+    await this.connect_ws();
 
     let connection = this.reference.current;
 
     connection.onopen = (msg) => {
-      console.log("connected", msg);
       this.getTicksHistory();
       this.getActiveSymbols();
       this.getContractsForSymbol();
@@ -104,6 +117,8 @@ export default class AppStore {
       this.api.disconnect();
     }
     if (data.msg_type === "active_symbols") {
+      this.symbols = [];
+
       // get every market
       data.active_symbols.forEach((item) => {
         if (!this.markets.includes(item.market_display_name)) {
@@ -113,7 +128,9 @@ export default class AppStore {
       // get every symbol
       data.active_symbols.forEach((item) => {
         if (!this.symbols.includes(item.display_name)) {
-          this.symbols.push(item.display_name);
+          if (item.market_display_name == this.selected_market) {
+            this.symbols.push(item.display_name);
+          }
         }
         //todo: filter based on selected_market
       });
@@ -131,7 +148,7 @@ export default class AppStore {
       // console.log("Spot: %f", data.proposal.spot);
     } else if (data.msg_type === "history") {
       this.ticks_history = [];
-      this.ticks_history=data.history;
+      this.ticks_history = data.history;
     } else if (data.msg_type === "tick") {
       // console.log(this.ticks_history, data.tick.quote);
     }
@@ -141,13 +158,17 @@ export default class AppStore {
 decorate(AppStore, {
   connected: observable,
   isLoading: observable,
+
   markets: observable,
   symbols: observable,
   contracts_for: observable,
-  assets: observable,
   selected_market: observable,
   selected_symbol: observable,
   selected_trade_type: observable,
+  setSelectedMarket: action.bound,
+  setSelectedSymbol: action.bound,
+  setSelectedContractsFor: action.bound,
+
   tick_id: observable,
   ticks_history: observable,
   ticks_history_request: observable,

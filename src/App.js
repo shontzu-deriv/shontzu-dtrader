@@ -7,16 +7,20 @@ import { useStore } from "./store/AppStore";
 
 function App() {
   const appStore = useStore();
-  const { connect_wss, getTicksHistory, getActiveSymbols, getContractsForSymbol} = appStore;
+  const { connect_wss } = appStore;
 
-  React.useEffect(()=>{
-    connect_wss()
-  },[])
+  React.useEffect(() => {
+    connect_wss();
+  }, []);
 
   return (
     <div className="App">
-      <Chart />
-      <Form />
+      <div>
+        <Chart />
+      </div>
+      <div>
+        <Form />
+      </div>
     </div>
   );
 }
