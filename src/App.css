@@ -3,10 +3,12 @@
   height: 100vh;
   color: white;
   text-align: center;
+  padding: 2%;
 }
 
 .App > div {
-  width: 50%;
+  display: flex;
+  justify-content: space-around;
   margin: auto;
 }
 
@@ -29,7 +31,7 @@ input {
 }
 
 span{
-  padding:5px;
+  margin:5px;
 }
 
 option {
@@ -41,6 +43,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid white;
 }
 
 header > input {
@@ -55,4 +58,11 @@ footer{
   bottom:0;
   text-align: center;
   color:transparent;
+}
+
+
+@media only screen and (min-width: 600px) {
+  .App > div {
+    display:flex;
+  }
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { observer } from "mobx-react";
 import { useStore } from "../store/AppStore";
 
@@ -12,7 +12,6 @@ const Form = () => {
     setSelectedSymbol,
     setSelectedContractsFor,
   } = app_store;
-
 
   return (
     <div className="form">
@@ -46,6 +45,10 @@ const Form = () => {
             </option>
           ))}
         </select>
+      </div>
+      <div>
+        <button>BUY</button>
+        <button>SELL</button>
       </div>
     </div>
   );
