@@ -5,21 +5,26 @@ export default class AppStore {
   app_id = 1089;
   reference = useRef();
 
-  markets = []; //todo (if !includes(e){markets.push(e.market_display_name)})
-  symbols = []; //todo (if (e.market_display_name == this.selected_market){symbols.push(e.display_name)})
+  markets = []; // (if !includes(e){markets.push(e.market_display_name)})
+  symbols = []; // (if (e.market_display_name == this.selected_market){symbols.push(e.display_name)})
   contracts_for = [];
   selected_market = "Derived";
   selected_symbol = { name: "EUR/AUD", symbol: "R_50" };
   selected_contracts_for = "Asians";
-
-  tick_id = 0;
+  tickstream = null;
   ticks_history = [];
 
   profile = {
-    login_id: "",
-    total_balance: 0,
-    token: { authorize: "" },
+    login_id: null,
+    total_balance: 10000,
+    token: { authorize: "null" },
     expense_item: [],
+  };
+  balance = {
+    balance: 10000,
+    currency: null,
+    id: null,
+    loginid: null,
   };
   contract_proposal = { proposal_id: "" };
   contract_portfolio = {
@@ -29,7 +34,7 @@ export default class AppStore {
     buy_price: 10,
     basis: "payout",
     duration_unit: "m",
-    symbol: "R_100",
+    symbol: this.selected_symbol.symbol,
     duration: 15,
   };
   get_markets = {
@@ -37,12 +42,16 @@ export default class AppStore {
     product_type: "basic",
   };
   ticks_history_request = {
-    ticks_history: "R_50",
+    ticks_history: this.selected_symbol.symbol,
     adjust_start_time: 1,
     count: 10,
     end: "latest",
     start: 1,
     style: "ticks",
+  };
+  tickstream_request = {
+    ticks: this.selected_symbol.symbol,
+    subscribe: 1,
   };
   active_symbols_request = {
     active_symbols: "brief",
@@ -56,7 +65,7 @@ export default class AppStore {
   };
 
   setToken(token) {
-    this.profile.token.authorize = token
+    this.profile.token.authorize = token;
   }
 
   setSelectedMarket(market) {
@@ -68,6 +77,7 @@ export default class AppStore {
     this.selected_symbol.name = symbol;
     this.getActiveSymbols();
     this.getContractsForSymbol();
+    this.getTickstream();
   }
 
   setSelectedContractsFor(contract) {
@@ -89,6 +99,7 @@ export default class AppStore {
       this.getTicksHistory();
       this.getActiveSymbols();
       this.getContractsForSymbol();
+      this.getTickstream();
     };
 
     connection.onmessage = (msg) => {
@@ -106,6 +117,10 @@ export default class AppStore {
     this.reference.current.send(JSON.stringify(this.ticks_history_request));
   }
 
+  getTickstream() {
+    // this.reference.current.send({ forget_all: "ticks" });
+    this.reference.current.send(JSON.stringify(this.tickstream_request));
+  }
   getActiveSymbols() {
     this.reference.current.send(JSON.stringify(this.active_symbols_request));
   }
@@ -146,7 +161,6 @@ export default class AppStore {
       });
     } else if (data.msg_type === "contracts_for") {
       // this.contracts_for = [];
-      console.log("contracts for ", data.contracts_for);
       data.contracts_for.available.forEach((contract) => {
         if (!this.contracts_for.includes(contract.contract_category_display)) {
           this.contracts_for.push(contract.contract_category_display);
@@ -160,12 +174,16 @@ export default class AppStore {
           subscribe: 1,
         })
       );
-      console.log("authorized")
+      console.log("authorized");
+    } else if (data.msg_type === "balance") {
+      this.balance = data.balance;
+      console.log("balance ", this.balance);
     } else if (data.msg_type === "history") {
       this.ticks_history = [];
       this.ticks_history = data.history;
     } else if (data.msg_type === "tick") {
-      // console.log(this.ticks_history, data.tick.quote);
+      this.getTicksHistory()
+      this.tickstream = data.tick.quote;
     }
   }
 }
@@ -183,12 +201,11 @@ decorate(AppStore, {
   setSelectedMarket: action.bound,
   setSelectedSymbol: action.bound,
   setSelectedContractsFor: action.bound,
-
+  balance: observable,
   profile: observable,
   setToken: action.bound,
   getAuthorize: action.bound,
-  
-  tick_id: observable,
+
   ticks_history: observable,
   ticks_history_request: observable,
   contracts_for_symbol_request: observable,
@@ -201,6 +218,10 @@ decorate(AppStore, {
   getTicksHistory: action.bound,
   getActiveSymbols: action.bound,
   getContractsForSymbol: action.bound,
+  tickstream: observable,
+  tickstream_request: observable,
+  setTickstream: action.bound,
+  getTickstream: action.bound,
 });
 
 let store_context;

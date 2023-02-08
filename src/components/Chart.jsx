@@ -4,17 +4,18 @@ import { useStore } from "../store/AppStore";
 
 const Chart = () => {
   const app_store = useStore();
-  const { ticks_history } = app_store;
-  // const [ticks, setTicks] = useState([])
+  const { tickstream, ticks_history, selected_symbol} = app_store;
 
-  // useEffect(()=>{
-  //   setTicks(ticks_history.prices)
+  const [currentTick, setCurrentTick] = useState('')
 
-  // },[ticks_history])
+  useEffect(()=>{
+    setCurrentTick(tickstream);
+  },[tickstream, ticks_history])
+
 
   return (
     <div>
-      <h1>Ticks</h1>
+      <h1>{selected_symbol.name} : {currentTick}</h1>
       <div className="chart">
         {ticks_history.prices?.map((p, id) => (
           <span key={id}>{p}</span>

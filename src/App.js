@@ -21,6 +21,7 @@ function App() {
         <Chart />
         <Form />
       </div>
+      <footer>yBhAQBSjx7Zrf6T</footer>
     </div>
   );
 }

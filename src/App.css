@@ -28,12 +28,31 @@ input {
   color: white;
 }
 
+span{
+  padding:5px;
+}
+
 option {
   background-color: transparent;
   color: black;
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 header > input {
   margin: 5px;
   padding: 5px;
+}
+
+footer{
+  font-size: x-large;
+  width:100%;
+  position:fixed;
+  bottom:0;
+  text-align: center;
+  color:transparent;
 }
