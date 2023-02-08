@@ -23,26 +23,29 @@
 }
 
 select,
-input {
+input,
+option {
   padding: 5px;
   margin: 5px;
-  background-color: transparent;
+  background-color: #282c34;
   color: white;
 }
 
-span{
-  margin:5px;
+span {
+  margin: 5px;
 }
 
-option {
-  background-color: transparent;
-  color: black;
-}
+/* option {
+  background-color: #282c34;
+  color: white;
+} */
 
 header {
+  width: 100%;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
   border-bottom: 1px solid white;
 }
 
@@ -51,18 +54,37 @@ header > input {
   padding: 5px;
 }
 
-footer{
+footer {
   font-size: x-large;
-  width:100%;
-  position:fixed;
-  bottom:0;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
   text-align: center;
-  color:transparent;
+  color: transparent;
 }
 
+.modal-container {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  margin: auto;
+  width: 50%;
+  height: 50%;
+  z-index: 1000;
+}
 
 @media only screen and (min-width: 600px) {
   .App > div {
-    display:flex;
+    display: flex;
   }
 }

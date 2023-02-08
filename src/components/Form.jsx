@@ -28,10 +28,10 @@ const Form = () => {
       </div>
       <div>
         Symbol:
-        <select onChange={(s) => setSelectedSymbol(s.target.value)}>
+        <select onChange={(s) => setSelectedSymbol(JSON.parse(s.target.value))}>
           {symbols.map((s, id) => (
-            <option key={id} value={s.key}>
-              {s}
+            <option key={id} value={JSON.stringify(s)}>
+              {s.display_name}
             </option>
           ))}
         </select>

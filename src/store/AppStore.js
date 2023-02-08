@@ -74,9 +74,17 @@ export default class AppStore {
   }
 
   setSelectedSymbol(symbol) {
-    this.selected_symbol.name = symbol;
+    // console.log(symbol)
+    this.reference.current.send(
+      JSON.stringify({
+        forget_all: "ticks",
+      })
+    );
+    this.selected_symbol.symbol = symbol.symbol;
+    this.selected_symbol.name = symbol.display_name;
     this.getActiveSymbols();
     this.getContractsForSymbol();
+    this.getTicksHistory();
     this.getTickstream();
   }
 
@@ -104,7 +112,6 @@ export default class AppStore {
 
     connection.onmessage = (msg) => {
       let data = JSON.parse(msg.data);
-      console.log(data);
       this.SwitchStatement(data);
     };
 
@@ -135,6 +142,13 @@ export default class AppStore {
     this.reference.current.send(JSON.stringify(this.profile.token));
   }
 
+  logOut() {
+    this.reference.current.send(
+      JSON.stringify({
+        logout: 1,
+      })
+    );
+  }
   //THE switch statement
   SwitchStatement(data) {
     if (data.error !== undefined) {
@@ -155,7 +169,7 @@ export default class AppStore {
         if (!this.symbols.includes(item.display_name)) {
           //filter based on selected_market
           if (item.market_display_name == this.selected_market) {
-            this.symbols.push(item.display_name);
+            this.symbols.push(item);
           }
         }
       });
@@ -174,16 +188,27 @@ export default class AppStore {
           subscribe: 1,
         })
       );
-      console.log("authorized");
     } else if (data.msg_type === "balance") {
       this.balance = data.balance;
-      console.log("balance ", this.balance);
     } else if (data.msg_type === "history") {
       this.ticks_history = [];
       this.ticks_history = data.history;
     } else if (data.msg_type === "tick") {
-      this.getTicksHistory()
+      this.getTicksHistory();
       this.tickstream = data.tick.quote;
+    } else if (data.msg_type === "logout") {
+      this.profile = {
+        login_id: null,
+        total_balance: 10000,
+        token: { authorize: "null" },
+        expense_item: [],
+      };
+      this.balance = {
+        balance: 10000,
+        currency: null,
+        id: null,
+        loginid: null,
+      };
     }
   }
 }
@@ -222,6 +247,7 @@ decorate(AppStore, {
   tickstream_request: observable,
   setTickstream: action.bound,
   getTickstream: action.bound,
+  logOut: action.bound,
 });
 
 let store_context;

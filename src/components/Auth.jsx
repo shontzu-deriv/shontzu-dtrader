@@ -1,41 +1,62 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { useStore } from "../store/AppStore";
 
 const Auth = () => {
   const app_store = useStore();
   const { logOut, balance, setToken, getAuthorize } = app_store;
+  const [modal, setModal] = useState(false);
 
-  useEffect(() => {}, [balance]); 
-  
+  useEffect(() => {}, [balance]);
+
   function handleChange(e) {
     setToken(e);
   }
   return (
-    <header>
-      {balance.loginid == null ? (
-        <p>you're not logged in</p>
-      ) : (
-        <p>{balance.loginid}</p>
-      )}
-      <div>
-        AUTHENTICATE:
-        <input
-          placeholder="Place your Auth token here"
-          onChange={(e) => {
-            handleChange(e.target.value);
-          }}
-        />
+    <div>
+      <header>
         {balance.loginid == null ? (
-          <button onClick={getAuthorize}>Authorize</button>
+          <button onClick={() => setModal(true)}>Log In</button>
         ) : (
-          <button onClick={logOut}>Log Out</button>
+          <button onClick={logOut}>
+            {balance.loginid}
+            <br />
+            Log Out
+          </button>
         )}
-      </div>
-      <h2>
-        $ {balance.balance} {balance.currency}
-      </h2>
-    </header>
+        <h2>
+          $ {balance.balance} {balance.currency}
+        </h2>
+      </header>
+      {modal ? (
+        <div className="modal-container">
+          <div className="modal">
+            <button onClick={() => setModal(false)}>X</button>
+            <h1>AUTHENTICATE:</h1>
+            <span>
+              <input
+                placeholder="Place your Auth token here"
+                onChange={(e) => {
+                  handleChange(e.target.value);
+                }}
+              />
+              <button
+                onClick={() => {
+                  setModal(false);
+                  getAuthorize()
+                }}
+              >
+                Authorize
+              </button>
+            </span>
+            <span style={{ color: "gray" }}>yBhAQBSjx7Zrf6T</span>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
+    </div>
   );
 };
+
 export default observer(Auth);

@@ -24,8 +24,8 @@ const activeSymbolsResponse = async (res) => {
 
   if (data.msg_type === "active_symbols") {
     data.active_symbols.forEach((element) => {
-      console.log(symbol.symbol, element.market_display_name);
-      console.log(element.symbol);
+      // console.log(symbol.symbol, element.market_display_name);
+      // console.log(element.symbol);
     });
   }
 
@@ -58,7 +58,7 @@ const contractsForSymbolResponse = async (res) => {
   }
 
   if (data.msg_type === "contracts_for") {
-    console.log(data.contracts_for);
+    // console.log(data.contracts_for);
   }
 
   connection.removeEventListener("message", contractsForSymbolResponse, false);
