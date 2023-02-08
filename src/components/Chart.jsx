@@ -14,12 +14,12 @@ const Chart = () => {
 
   return (
     <div>
-      <h1>ticks</h1>
-      {ticks_history.prices?.map((p, id) => (
-        <p key={id}>
-          {p}
-        </p>
-      ))}
+      <h1>Ticks</h1>
+      <div className="chart">
+        {ticks_history.prices?.map((p, id) => (
+          <span key={id}>{p}</span>
+        ))}
+      </div>
     </div>
   );
 };

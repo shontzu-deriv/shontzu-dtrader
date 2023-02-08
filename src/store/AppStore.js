@@ -9,11 +9,12 @@ export default class AppStore {
   symbols = []; //todo (if (e.market_display_name == this.selected_market){symbols.push(e.display_name)})
   contracts_for = [];
   selected_market = "Derived";
-  selected_symbol = "AUD/USD";
+  selected_symbol = { name: "EUR/AUD", symbol: "R_50" };
   selected_contracts_for = "Asians";
 
   tick_id = 0;
   ticks_history = [];
+
   profile = {
     login_id: "",
     total_balance: 0,
@@ -48,20 +49,25 @@ export default class AppStore {
     product_type: "basic",
   };
   contracts_for_symbol_request = {
-    contracts_for: "R_50",
+    contracts_for: this.selected_symbol.symbol,
     currency: "USD",
     landing_company: "svg",
     product_type: "basic",
   };
 
+  setToken(token) {
+    this.profile.token.authorize = token
+  }
+
   setSelectedMarket(market) {
     this.selected_market = market;
-    this.getActiveSymbols()
+    this.getActiveSymbols();
   }
 
   setSelectedSymbol(symbol) {
-    this.selected_symbol = symbol;
-    this.getActiveSymbols()
+    this.selected_symbol.name = symbol;
+    this.getActiveSymbols();
+    this.getContractsForSymbol();
   }
 
   setSelectedContractsFor(contract) {
@@ -110,6 +116,10 @@ export default class AppStore {
     );
   }
 
+  getAuthorize() {
+    this.reference.current.send(JSON.stringify(this.profile.token));
+  }
+
   //THE switch statement
   SwitchStatement(data) {
     if (data.error !== undefined) {
@@ -128,24 +138,29 @@ export default class AppStore {
       // get every symbol
       data.active_symbols.forEach((item) => {
         if (!this.symbols.includes(item.display_name)) {
+          //filter based on selected_market
           if (item.market_display_name == this.selected_market) {
             this.symbols.push(item.display_name);
           }
         }
-        //todo: filter based on selected_market
       });
     } else if (data.msg_type === "contracts_for") {
-      this.contracts_for = [];
+      // this.contracts_for = [];
+      console.log("contracts for ", data.contracts_for);
       data.contracts_for.available.forEach((contract) => {
         if (!this.contracts_for.includes(contract.contract_category_display)) {
           this.contracts_for.push(contract.contract_category_display);
         }
         //todo: filter based on selected_symbol
       });
-    } else if (data.msg_type === "proposal") {
-      // console.log("Ask Price: %s", data.proposal.display_value);
-      // console.log("Payout: %f", data.proposal.payout);
-      // console.log("Spot: %f", data.proposal.spot);
+    } else if (data.msg_type === "authorize") {
+      this.reference.current.send(
+        JSON.stringify({
+          balance: 1,
+          subscribe: 1,
+        })
+      );
+      console.log("authorized")
     } else if (data.msg_type === "history") {
       this.ticks_history = [];
       this.ticks_history = data.history;
@@ -169,11 +184,14 @@ decorate(AppStore, {
   setSelectedSymbol: action.bound,
   setSelectedContractsFor: action.bound,
 
+  profile: observable,
+  setToken: action.bound,
+  getAuthorize: action.bound,
+  
   tick_id: observable,
   ticks_history: observable,
   ticks_history_request: observable,
   contracts_for_symbol_request: observable,
-  profile: observable,
   buy_settings: observable,
   error: observable,
   message: observable,
